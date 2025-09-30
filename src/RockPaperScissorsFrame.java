@@ -17,18 +17,18 @@ public class RockPaperScissorsFrame extends JFrame {
     JButton scissorsButton;
     JButton quitButton;
 
-    ImageIcon rockIcon = new ImageIcon("src/rockImage.png");
+    ImageIcon rockIcon = new ImageIcon("src/closedFist.png");
     Image originalImg = rockIcon.getImage();
     Image scaleImg = originalImg.getScaledInstance(100, 100, Image.SCALE_SMOOTH);
     ImageIcon rockScaleIcon = new ImageIcon(scaleImg);
 
-    ImageIcon paperIcon = new ImageIcon("src/paperImage.png");
+    ImageIcon paperIcon = new ImageIcon("src/openHand.png");
     Image original = paperIcon.getImage();
     Image img = original.getScaledInstance(100, 100, Image.SCALE_SMOOTH);
     ImageIcon paperScaleIcon = new ImageIcon(img);
 
 
-    ImageIcon scissorsIcon = new ImageIcon("src/scissorsImage.png");
+    ImageIcon scissorsIcon = new ImageIcon("src/scissor.png");
     Image oGImg = scissorsIcon.getImage();
     Image sImg = oGImg.getScaledInstance(100, 100, Image.SCALE_SMOOTH);
     ImageIcon scissorsScaleIcon = new ImageIcon(sImg);
@@ -43,6 +43,8 @@ public class RockPaperScissorsFrame extends JFrame {
     int rockUsed = 0;
     int paperUsed = 0;
     int scissorsUsed = 0;
+
+    String lastUsedPlayer = "";
 
     public RockPaperScissorsFrame() {
         super("Rock Paper Scissors");
@@ -115,6 +117,29 @@ public class RockPaperScissorsFrame extends JFrame {
         }
     }
 
+    class LastUsed implements Strategy {
+        public String getMove(String playerMove) {
+            String computerMove = "";
+            switch (lastUsedPlayer)
+            {
+                case "R":
+                    computerMove = "P";
+                    break;
+                case "P":
+                    computerMove = "S";
+                    break;
+                case "S":
+                    computerMove = "R";
+                    break;
+                default:
+                    computerMove = "X";
+                    break;
+            }
+            return computerMove;
+        }
+
+    }
+
 
     public void returnComputerMove(String playerMove) {
         int randomNum = (int) (Math.random() * 100) + 1;
@@ -134,9 +159,23 @@ public class RockPaperScissorsFrame extends JFrame {
             computerMove = mostUsed.getMove(playerMove);
             setDisplayText(computerMove, "Most Used", playerMove);
         } else if (randomNum <= 70) {
+            if ((rockUsed == 1 && (scissorsUsed== 0 && paperUsed == 0)
+            || (scissorsUsed == 1 && (rockUsed == 0 && paperUsed == 0)
+            || (paperUsed == 1 && (scissorsUsed == 0 && rockUsed == 0)))))
+             {
+                 Random random = new Random();
+                 computerMove = random.getMove(playerMove);
+                 setDisplayText(computerMove, "Random", playerMove);
 
+            }else {
+                LastUsed lastUsed = new LastUsed();
+                computerMove = lastUsed.getMove(playerMove);
+                setDisplayText(computerMove, "Last Used", playerMove);
+            }
         } else {
-
+            Random random = new Random();
+            computerMove = random.getMove(playerMove);
+            setDisplayText(computerMove, "Random", playerMove);
         }
     }
 
@@ -164,7 +203,7 @@ public class RockPaperScissorsFrame extends JFrame {
     public void createResultPnl() {
         resultPnl = new JPanel();
 
-         displayTa = new JTextArea(15,40);
+         displayTa = new JTextArea(30,40);
         displayTa.setEditable(false);
          displayScroll = new JScrollPane(displayTa);
         resultPnl.add(displayScroll);
@@ -185,7 +224,7 @@ public class RockPaperScissorsFrame extends JFrame {
             String playerMove = "R";
             rockUsed++;
             returnComputerMove(playerMove);
-
+            lastUsedPlayer = playerMove;
         });
 
         paperButton = new JButton("Paper", paperScaleIcon);
@@ -195,6 +234,7 @@ public class RockPaperScissorsFrame extends JFrame {
             String playerMove = "P";
             paperUsed++;
             returnComputerMove(playerMove);
+            lastUsedPlayer = playerMove;
         });
 
         scissorsButton = new JButton("Scissors", scissorsScaleIcon);
@@ -204,6 +244,7 @@ public class RockPaperScissorsFrame extends JFrame {
             String playerMove = "S";
             scissorsUsed++;
             returnComputerMove(playerMove);
+            lastUsedPlayer = playerMove;
         });
 
         quitButton = new JButton("Quit");
@@ -219,7 +260,13 @@ public class RockPaperScissorsFrame extends JFrame {
 
     public void setDisplayText(String computerMove, String strategy, String playerMove) {
         if (computerMove.equals(playerMove)) {
-            displayTa.append(computerMove + " over " + playerMove +  "!"  + "(Tie!)" + "\n");
+            if (playerMove.equals("S")) {
+                displayTa.append("Scissors cuts Scissors " +  "(Tie! " + "Computer: "  + strategy+ ")\n");
+            } else if (playerMove.equals("R")) {
+                displayTa.append("Rock breaks Rock " +  "(Tie! Computer: " +strategy  + ")\n");
+            } else {
+                displayTa.append("Paper covers Paper " +  "(Tie! Computer: " + strategy + ")\n");
+            }
             ties += 1;
             tieLabel.setText("Ties: " + ties + "\n");
         } else if ((playerMove.equals("S") && computerMove.equals("P")) ||
@@ -230,7 +277,7 @@ public class RockPaperScissorsFrame extends JFrame {
             if (playerMove.equals("S")) {
                 displayTa.append("Scissors cuts Paper " +  "(Player Wins! " + "Computer: "  + strategy+ ")\n");
             } else if (playerMove.equals("R")) {
-                displayTa.append("Rocks breaks Scissors " +  "(Player Wins! Computer: " +strategy  + ")\n");
+                displayTa.append("Rock breaks Scissors " +  "(Player Wins! Computer: " +strategy  + ")\n");
             } else {
                 displayTa.append("Paper covers Rock " +  "(Player Wins! Computer: " + strategy + ")\n");
             }

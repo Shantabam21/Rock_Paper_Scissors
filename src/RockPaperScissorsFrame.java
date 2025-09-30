@@ -8,6 +8,10 @@ public class RockPaperScissorsFrame extends JFrame {
     JPanel resultPnl;
     JPanel bottomPnl;
 
+    JLabel playerLabel;
+    JLabel computerLabel;
+    JLabel tieLabel;
+
     JButton rockButton;
     JButton paperButton;
     JButton scissorsButton;
@@ -29,9 +33,16 @@ public class RockPaperScissorsFrame extends JFrame {
     Image sImg = oGImg.getScaledInstance(100, 100, Image.SCALE_SMOOTH);
     ImageIcon scissorsScaleIcon = new ImageIcon(sImg);
 
+    JTextArea displayTa;
+    JScrollPane displayScroll;
+
     int playerWins = 0;
     int computerWins = 0;
     int ties = 0;
+
+    int rockUsed = 0;
+    int paperUsed = 0;
+    int scissorsUsed = 0;
 
     public RockPaperScissorsFrame() {
         super("Rock Paper Scissors");
@@ -40,37 +51,161 @@ public class RockPaperScissorsFrame extends JFrame {
 
         createStatsPnl();
 
+        createResultPnl();
+
         createBottomPanel();
 
+
+
         add(mainPnl);
+        //mainPnl.setBackground(new Color(165,200,210));
     }
+
+    class LeastUsed implements Strategy {
+        public String getMove(String playerMove) {
+            String computerMove = "";
+            if (rockUsed == 1 && (scissorsUsed== 0 && paperUsed == 0)) {
+                computerMove = "P";
+            }
+            else if (scissorsUsed == 1 && (rockUsed == 0 && paperUsed == 0)) {
+                computerMove = "R";
+            }
+            else if (paperUsed == 1 && (scissorsUsed == 0 && rockUsed == 0)) {
+                computerMove = "S";
+            } else {
+                int lowestUsed = Math.min(rockUsed, Math.min(paperUsed, scissorsUsed));
+
+                if (lowestUsed == rockUsed) {
+                    computerMove = "P";
+                } else if (lowestUsed == paperUsed) {
+                    computerMove = "S";
+                } else {
+                    computerMove = "R";
+                }
+            }
+
+            return computerMove;
+        }
+    }
+
+    class MostUsed implements Strategy {
+        public String getMove(String playerMove) {
+            String computerMove = "";
+            if (rockUsed == 1 && (scissorsUsed== 0 && paperUsed == 0)) {
+                computerMove = "P";
+            }
+            else if (scissorsUsed == 1 && (rockUsed == 0 && paperUsed == 0)) {
+                computerMove = "R";
+            }
+            else if (paperUsed == 1 && (scissorsUsed == 0 && rockUsed == 0)) {
+                computerMove = "S";
+            } else {
+                int lowestUsed = Math.max(rockUsed, Math.max(paperUsed, scissorsUsed));
+
+                if (lowestUsed == rockUsed) {
+                    computerMove = "P";
+                } else if (lowestUsed == paperUsed) {
+                    computerMove = "S";
+                } else {
+                    computerMove = "R";
+                }
+            }
+
+            return computerMove;
+        }
+    }
+
+
+    public void returnComputerMove(String playerMove) {
+        int randomNum = (int) (Math.random() * 100) + 1;
+        String computerMove = "";
+
+        if (randomNum <= 10) {
+            Cheat cheat = new Cheat();
+            computerMove = cheat.getMove(playerMove);
+            setDisplayText(computerMove, "Cheat", playerMove);
+        } else if (randomNum <= 30) {
+            LeastUsed lowestUsed = new LeastUsed();
+            computerMove = lowestUsed.getMove(playerMove);
+            setDisplayText(computerMove, "Lowest Used", playerMove);
+
+        } else if (randomNum <= 50) {
+            MostUsed mostUsed = new MostUsed();
+            computerMove = mostUsed.getMove(playerMove);
+            setDisplayText(computerMove, "Most Used", playerMove);
+        } else if (randomNum <= 70) {
+
+        } else {
+
+        }
+    }
+
+
 
     public void createStatsPnl() {
         statsPnl = new JPanel();
-        JLabel playerLbl = new JLabel("Player Wins: \n");
-        JLabel computerLbl = new JLabel("Computer Wins:\n");
-        JLabel tieLbl = new JLabel("Ties: ");
+        statsPnl.setLayout(new GridLayout(3,1));
+        playerLabel = new JLabel("Player Wins: " + playerWins + "\n" );
+        playerLabel.setFont(new Font("Times New Roman",Font.BOLD,25));
+        computerLabel = new JLabel("Computer Wins: " + computerWins + "\n");
+        computerLabel.setFont(new Font("Times New Roman",Font.BOLD,25));
+        tieLabel= new JLabel("Ties: " + ties + "\n");
+        tieLabel.setFont(new Font("Times New Roman",Font.BOLD,25));
 
 
-        statsPnl.add(playerLbl);
-        statsPnl.add(computerLbl);
-        statsPnl.add(tieLbl);
+
+        statsPnl.add(playerLabel);
+        statsPnl.add(computerLabel);
+        statsPnl.add(tieLabel);
         mainPnl.add(statsPnl,BorderLayout.WEST);
+        statsPnl.setBackground(Color.white);
+    }
+
+    public void createResultPnl() {
+        resultPnl = new JPanel();
+
+         displayTa = new JTextArea(15,40);
+        displayTa.setEditable(false);
+         displayScroll = new JScrollPane(displayTa);
+        resultPnl.add(displayScroll);
+        mainPnl.add(resultPnl,BorderLayout.CENTER);
+
+
     }
 
     public void createBottomPanel() {
         bottomPnl = new JPanel();
         bottomPnl.setLayout(new GridLayout(1,4));
         bottomPnl.setBackground(Color.black);
+
         rockButton = new JButton("Rock", rockScaleIcon);
         rockButton.setHorizontalTextPosition(JButton.CENTER);
         rockButton.setVerticalTextPosition(JButton.BOTTOM);
+        rockButton.addActionListener((ActionEvent ae) -> {
+            String playerMove = "R";
+            rockUsed++;
+            returnComputerMove(playerMove);
+
+        });
+
         paperButton = new JButton("Paper", paperScaleIcon);
         paperButton.setHorizontalTextPosition(JButton.CENTER);
         paperButton.setVerticalTextPosition(JButton.BOTTOM);
+        paperButton.addActionListener((ActionEvent e) -> {
+            String playerMove = "P";
+            paperUsed++;
+            returnComputerMove(playerMove);
+        });
+
         scissorsButton = new JButton("Scissors", scissorsScaleIcon);
         scissorsButton.setHorizontalTextPosition(JButton.CENTER);
         scissorsButton.setVerticalTextPosition(JButton.BOTTOM);
+        scissorsButton.addActionListener((ActionEvent e) -> {
+            String playerMove = "S";
+            scissorsUsed++;
+            returnComputerMove(playerMove);
+        });
+
         quitButton = new JButton("Quit");
 
         quitButton.addActionListener((ActionEvent ae) -> System.exit(0));
@@ -80,6 +215,41 @@ public class RockPaperScissorsFrame extends JFrame {
         bottomPnl.add(quitButton);
 
         mainPnl.add(bottomPnl,BorderLayout.SOUTH);
+    }
+
+    public void setDisplayText(String computerMove, String strategy, String playerMove) {
+        if (computerMove.equals(playerMove)) {
+            displayTa.append(computerMove + " over " + playerMove +  "!"  + "(Tie!)" + "\n");
+            ties += 1;
+            tieLabel.setText("Ties: " + ties + "\n");
+        } else if ((playerMove.equals("S") && computerMove.equals("P")) ||
+                (playerMove.equals("R") && computerMove.equals("S")) ||
+                (playerMove.equals("P") && computerMove.equals("R"))
+        )
+        {
+            if (playerMove.equals("S")) {
+                displayTa.append("Scissors cuts Paper " +  "(Player Wins! " + "Computer: "  + strategy+ ")\n");
+            } else if (playerMove.equals("R")) {
+                displayTa.append("Rocks breaks Scissors " +  "(Player Wins! Computer: " +strategy  + ")\n");
+            } else {
+                displayTa.append("Paper covers Rock " +  "(Player Wins! Computer: " + strategy + ")\n");
+            }
+
+            playerWins += 1;
+            playerLabel.setText("Player Wins: " + playerWins + "\n");
+        } else {
+            if (computerMove.equals("S")) {
+                displayTa.append("Scissors cuts paper (Computer Wins! Computer: " +  strategy + ")\n");
+            } else if (computerMove.equals("R")) {
+                displayTa.append("Rock breaks Scissors (Computer Wins! Computer: " +  strategy + ")\n");
+            } else {
+                displayTa.append("Paper covers Rock (Computer Wins! Computer: " +  strategy + ")\n");
+            }
+
+
+            computerWins += 1;
+            computerLabel.setText("Computer Wins: " + computerWins + "\n");
+        }
     }
 
 

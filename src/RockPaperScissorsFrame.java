@@ -2,6 +2,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 
+/**
+ * This class creates the GUI for the Rock-Paper-Scissors game.
+ * It manages the panels, buttons, and game logic such as tracking wins,
+ * ties, and using different computer strategies.
+ */
 public class RockPaperScissorsFrame extends JFrame {
     JPanel mainPnl;
     JPanel statsPnl;
@@ -46,6 +51,10 @@ public class RockPaperScissorsFrame extends JFrame {
 
     String lastUsedPlayer = "";
 
+    /**
+     * Initializes the RockPaperScissorsFrame, sets up the frame title,
+     * and creates the stats, result, and bottom panels.
+     */
     public RockPaperScissorsFrame() {
         super("Rock Paper Scissors");
         mainPnl = new JPanel();
@@ -63,6 +72,10 @@ public class RockPaperScissorsFrame extends JFrame {
         //mainPnl.setBackground(new Color(165,200,210));
     }
 
+
+    /**
+     * Strategy that returns the computer move based on the player's least used move.
+     */
     class LeastUsed implements Strategy {
         public String getMove(String playerMove) {
             String computerMove = "";
@@ -90,6 +103,9 @@ public class RockPaperScissorsFrame extends JFrame {
         }
     }
 
+    /**
+     * Strategy that returns the computer move based on the player's most used move.
+     */
     class MostUsed implements Strategy {
         public String getMove(String playerMove) {
             String computerMove = "";
@@ -117,6 +133,9 @@ public class RockPaperScissorsFrame extends JFrame {
         }
     }
 
+    /**
+     * Strategy that returns the computer move based on the player's last used move.
+     */
     class LastUsed implements Strategy {
         public String getMove(String playerMove) {
             String computerMove = "";
@@ -140,7 +159,11 @@ public class RockPaperScissorsFrame extends JFrame {
 
     }
 
-
+    /**
+     * Determines the computer's move using different strategies based on random chance,
+     * updates the display with the chosen strategy and result.
+     * @param playerMove the player's chosen move as a String ("R", "P", or "S")
+     */
     public void returnComputerMove(String playerMove) {
         int randomNum = (int) (Math.random() * 100) + 1;
         String computerMove = "";
@@ -180,7 +203,10 @@ public class RockPaperScissorsFrame extends JFrame {
     }
 
 
-
+    /**
+     * Creates and lays out the statistics panel showing player wins,
+     * computer wins, and ties.
+     */
     public void createStatsPnl() {
         statsPnl = new JPanel();
         statsPnl.setLayout(new GridLayout(3,1));
@@ -200,6 +226,10 @@ public class RockPaperScissorsFrame extends JFrame {
         statsPnl.setBackground(Color.white);
     }
 
+    /**
+     * Creates the result panel containing a scrollable text area to display
+     * game outcomes.
+     */
     public void createResultPnl() {
         resultPnl = new JPanel();
 
@@ -212,6 +242,10 @@ public class RockPaperScissorsFrame extends JFrame {
 
     }
 
+    /**
+     * Creates the bottom panel with buttons for Rock, Paper, Scissors, and Quit,
+     * and sets up their action listeners.
+     */
     public void createBottomPanel() {
         bottomPnl = new JPanel();
         bottomPnl.setLayout(new GridLayout(1,4));
@@ -240,7 +274,7 @@ public class RockPaperScissorsFrame extends JFrame {
         scissorsButton = new JButton("Scissors", scissorsScaleIcon);
         scissorsButton.setHorizontalTextPosition(JButton.CENTER);
         scissorsButton.setVerticalTextPosition(JButton.BOTTOM);
-        scissorsButton.addActionListener((ActionEvent e) -> {
+        scissorsButton.addActionListener((ActionEvent ae) -> {
             String playerMove = "S";
             scissorsUsed++;
             returnComputerMove(playerMove);
@@ -258,6 +292,13 @@ public class RockPaperScissorsFrame extends JFrame {
         mainPnl.add(bottomPnl,BorderLayout.SOUTH);
     }
 
+    /**
+     * Updates the display text area and statistics labels based on the outcome of a round
+     * which inlcudes the moves played, the winner, and the strategy used by the computer
+     * @param computerMove - The computer's chosen move ("R", "S", or "P")
+     * @param strategy - The strategy that was randomly chosen for the computer to use
+     * @param playerMove - The player's chosen move as a string ("R", "S", or "P")
+     */
     public void setDisplayText(String computerMove, String strategy, String playerMove) {
         if (computerMove.equals(playerMove)) {
             if (playerMove.equals("S")) {

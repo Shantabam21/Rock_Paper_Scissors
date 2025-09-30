@@ -1,7 +1,11 @@
 import javax.swing.*;
 import java.awt.*;
 
+
 public class RockPaperScissorsRunner {
+    /**
+     * Initializes the JFrame window and sets the dimensipns, and its visibility
+     */
     public static void main(String[] args) {
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         Dimension dimension = toolkit.getScreenSize();

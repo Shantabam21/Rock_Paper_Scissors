@@ -1,3 +1,6 @@
+/**
+ * Randomly chooses a move for the computer
+ */
 public class Random implements Strategy {
     public String getMove(String playerMove) {
         String[] arr = {"R","P","S"};
